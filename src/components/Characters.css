@@ -1,0 +1,23 @@
+.Container {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.Characters {
+  display: grid;
+  grid-template-columns: repeat(3, 300px);
+  gap: 30px;
+  width: 1200px auto;
+}
+
+.Card__images {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.DarkMode__Card {
+  background-color: #40587c;
+}
