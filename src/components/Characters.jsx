@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useMemo } from "react";
+import React, { useState, useEffect, useReducer, useMemo, useRef } from "react";
 import "./Characters.css";
 
 const Characters = ({ darkMode }) => {
@@ -21,6 +21,7 @@ const Characters = ({ darkMode }) => {
   const [characters, setCharacters] = useState([]);
   const [favorites, dispatch] = useReducer(favoriteReducer, initialState);
   const [search, setSearch] = useState("");
+  const searchInput = useRef(null);
 
   const handleClick = (favorite) => {
     dispatch({ type: "ADD_TO_FAVORITE", payload: favorite });
@@ -32,13 +33,17 @@ const Characters = ({ darkMode }) => {
       .then((data) => setCharacters(data.results));
   }, []);
 
-  const handleSearch = (value) => {
-    setSearch(value);
+  const handleSearch = () => {
+    setSearch(searchInput.current.value);
   };
 
-  // const filteredUser = characters.filter((user) => {
-  //   return user.name.toLowercase().includes(search.toLocaleLowerCase());
-  // });
+  const filteredUser = useMemo(
+    () =>
+      characters.filter((user) => {
+        return user.name.toLowerCase().includes(search.toLowerCase());
+      }),
+    [characters, search]
+  );
 
   return (
     <div className="Container">
@@ -47,13 +52,16 @@ const Characters = ({ darkMode }) => {
           <li key={index}>{character.name}</li>
         ))}
       </div>
-
-      <div className="Input">
-        <input type="text" onChange={(e) => handleSearch(e)} />
+      <div className="Search">
+        <input
+          type="text"
+          value={search}
+          ref={searchInput}
+          onChange={() => handleSearch()}
+        />
       </div>
-
       <div className="Characters">
-        {characters.map((character, key) => (
+        {filteredUser.map((character, key) => (
           <div
             className={
               darkMode
