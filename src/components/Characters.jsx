@@ -1,5 +1,13 @@
-import React, { useState, useEffect, useReducer, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useReducer,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import "./Characters.css";
+import Search from "./Search";
+import useCharacters from "../hooks/useCharacters";
 
 const Characters = ({ darkMode }) => {
   const initialState = {
@@ -18,24 +26,21 @@ const Characters = ({ darkMode }) => {
     }
   };
 
-  const [characters, setCharacters] = useState([]);
   const [favorites, dispatch] = useReducer(favoriteReducer, initialState);
   const [search, setSearch] = useState("");
   const searchInput = useRef(null);
+
+  const API = "https://rickandmortyapi.com/api/character";
+
+  const characters = useCharacters(API);
 
   const handleClick = (favorite) => {
     dispatch({ type: "ADD_TO_FAVORITE", payload: favorite });
   };
 
-  useEffect(() => {
-    fetch("https://rickandmortyapi.com/api/character")
-      .then((response) => response.json())
-      .then((data) => setCharacters(data.results));
-  }, []);
-
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     setSearch(searchInput.current.value);
-  };
+  }, []);
 
   const filteredUser = useMemo(
     () =>
@@ -52,14 +57,11 @@ const Characters = ({ darkMode }) => {
           <li key={index}>{character.name}</li>
         ))}
       </div>
-      <div className="Search">
-        <input
-          type="text"
-          value={search}
-          ref={searchInput}
-          onChange={() => handleSearch()}
-        />
-      </div>
+      <Search
+        search={search}
+        searchInput={searchInput}
+        handleSearch={handleSearch}
+      />
       <div className="Characters">
         {filteredUser.map((character, key) => (
           <div
